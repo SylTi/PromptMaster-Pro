@@ -20,6 +20,8 @@ export interface PromptConfig {
   wslString: string;
   useDayMonthFormat: boolean;
   use12hTime: boolean;
+  showGroup: boolean;
+  invertUserGroup: boolean;
   osBgColor: string;
   osTextColor: string;
   shellBgColor: string;

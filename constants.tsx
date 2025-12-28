@@ -22,12 +22,23 @@ export const BASH_TEMPLATE = (
   useDayMonth: boolean, 
   use12h: boolean, 
   pathStyle: PathStyle,
+  showGroup: boolean,
+  invertUserGroup: boolean,
   colors: { osBg: string, osFg: string, shellBg: string, shellFg: string, userBg: string, userFg: string, dirBg: string, dirFg: string, timeFg: string, accent: string, symbol: string }
 ) => {
   const dateFormat = useDayMonth ? '%d/%m/%y' : '%m/%d/%y';
   const timeFormat = use12h ? '\\@' : '\\t';
   const bashPath = pathStyle === PathStyle.FULL ? '$(pwd)' : (pathStyle === PathStyle.TAIL ? '\\W' : '\\w');
   
+  let userGroupString = "\\u";
+  if (showGroup) {
+    if (invertUserGroup) {
+      userGroupString = "\$(id -gn) / \\u";
+    } else {
+      userGroupString = "\\u / \$(id -gn)";
+    }
+  }
+
   return `# NetworkChuck Inspired Prompt for BASH
 # Add this to your ~/.bashrc
 
@@ -68,7 +79,7 @@ function build_prompt() {
     local GIT_STATUS=$(get_git_status)
 
     # Line 1
-    PS1="\${OS_SEG}  ${wslString} \${SHELL_SEG}  bash \${USER_SEG}  \\u / \$(id -gn) \${RESET}\\n"
+    PS1="\${OS_SEG}  ${wslString} \${SHELL_SEG}  bash \${USER_SEG}  ${userGroupString} \${RESET}\\n"
     # Line 2
     PS1+="\${TIME_FG}\${last_exec_ms}ms ${prefix} • \\D{${dateFormat}} ${timeFormat}\${RESET}\\n"
     # Line 3
@@ -89,12 +100,23 @@ export const ZSH_TEMPLATE = (
   useDayMonth: boolean, 
   use12h: boolean, 
   pathStyle: PathStyle,
+  showGroup: boolean,
+  invertUserGroup: boolean,
   colors: { osBg: string, osFg: string, shellBg: string, shellFg: string, userBg: string, userFg: string, dirBg: string, dirFg: string, timeFg: string, accent: string, symbol: string }
 ) => {
   const dateFormat = useDayMonth ? '%d/%m/%y' : '%m/%d/%y';
   const timeFormat = use12h ? '%r' : '%T';
   const zshPath = pathStyle === PathStyle.FULL ? '%d' : (pathStyle === PathStyle.TAIL ? '%c' : '%~');
   
+  let userGroupString = "%n";
+  if (showGroup) {
+    if (invertUserGroup) {
+      userGroupString = "$(id -gn) / %n";
+    } else {
+      userGroupString = "%n / $(id -gn)";
+    }
+  }
+
   return `# NetworkChuck Inspired Prompt for ZSH
 # Add this to your ~/.zshrc
 
@@ -137,7 +159,7 @@ function build_prompt() {
     
     local git_status=$(get_git_status)
 
-    PROMPT="\${OS_SEG}  ${wslString} \${SHELL_SEG}  zsh \${USER_SEG}  %n / \$(id -gn) \${RESET}"
+    PROMPT="\${OS_SEG}  ${wslString} \${SHELL_SEG}  zsh \${USER_SEG}  ${userGroupString} \${RESET}"
     PROMPT+=$'\\n'
     PROMPT+="\${TIME_FG}\${last_exec_ms}ms ${prefix} • %D{${dateFormat}} ${timeFormat}\${RESET}"
     PROMPT+=$'\\n'

@@ -17,6 +17,8 @@ const App: React.FC = () => {
     wslString: '(WSL)',
     useDayMonthFormat: false,
     use12hTime: false,
+    showGroup: true,
+    invertUserGroup: false,
     osBgColor: '#2a2a2a',
     osTextColor: '#ffffff',
     shellBgColor: '#ffffff',
@@ -69,8 +71,8 @@ const App: React.FC = () => {
 
   const currentCode = useMemo(() => {
     return shell === ShellType.BASH 
-      ? BASH_TEMPLATE(config.user, config.context, config.prefix, config.wslString, config.useDayMonthFormat, config.use12hTime, config.pathStyle, currentAnsiColors)
-      : ZSH_TEMPLATE(config.user, config.context, config.prefix, config.wslString, config.useDayMonthFormat, config.use12hTime, config.pathStyle, currentAnsiColors);
+      ? BASH_TEMPLATE(config.user, config.context, config.prefix, config.wslString, config.useDayMonthFormat, config.use12hTime, config.pathStyle, config.showGroup, config.invertUserGroup, currentAnsiColors)
+      : ZSH_TEMPLATE(config.user, config.context, config.prefix, config.wslString, config.useDayMonthFormat, config.use12hTime, config.pathStyle, config.showGroup, config.invertUserGroup, currentAnsiColors);
   }, [shell, config, currentAnsiColors]);
 
   const handleCopy = () => {
@@ -114,6 +116,12 @@ const App: React.FC = () => {
     }
     return config.directorySim;
   }, [config.directorySim, config.pathStyle, config.user]);
+
+  const userGroupDisplay = useMemo(() => {
+    if (!config.showGroup) return config.user;
+    if (config.invertUserGroup) return `${config.context} / ${config.user}`;
+    return `${config.user} / ${config.context}`;
+  }, [config.user, config.context, config.showGroup, config.invertUserGroup]);
 
   const getPreviewBg = (col: string) => col === 'none' ? 'transparent' : col;
 
@@ -181,7 +189,7 @@ const App: React.FC = () => {
 
             {/* General Settings */}
             <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-700/50 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -202,9 +210,29 @@ const App: React.FC = () => {
                   />
                   <label htmlFor="time12" className="text-xs font-medium text-slate-300">12h Time (AM/PM)</label>
                 </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="showGroup"
+                    checked={config.showGroup}
+                    onChange={(e) => setConfig({ ...config, showGroup: e.target.checked })}
+                    className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="showGroup" className="text-xs font-medium text-slate-300">Display Group</label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="invertOrder"
+                    checked={config.invertUserGroup}
+                    onChange={(e) => setConfig({ ...config, invertUserGroup: e.target.checked })}
+                    className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="invertOrder" className="text-xs font-medium text-slate-300">Invert User/Group</label>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 pt-2">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Preview User</label>
                   <input
@@ -354,7 +382,7 @@ const App: React.FC = () => {
             </div>
             
             <div className="p-6 mono text-sm min-h-[250px] leading-relaxed select-none overflow-x-auto">
-              {/* Row 1 */}
+              {/* Row 1 - Segments */}
               <div className="flex mb-2 items-stretch h-7 w-fit">
                 <div className="px-3 flex items-center gap-1.5 whitespace-nowrap" style={{ backgroundColor: getPreviewBg(config.osBgColor), color: config.osTextColor }}>
                   <span style={{ color: config.osTextColor }}>{ICONS.ubuntu}</span> {config.wslString}
@@ -363,12 +391,12 @@ const App: React.FC = () => {
                   {ICONS.terminal} {shell}
                 </div>
                 <div className="px-3 flex items-center gap-1.5 whitespace-nowrap font-bold" style={{ backgroundColor: getPreviewBg(config.userBgColor), color: config.userTextColor }}>
-                  {ICONS.user} {config.user} / {config.context}
+                  {ICONS.user} {userGroupDisplay}
                 </div>
               </div>
               
-              {/* Row 2 */}
-              <div className="mb-2 font-medium whitespace-nowrap" style={{ color: config.timeTextColor }}>
+              {/* Row 2 - Time (Middle) */}
+              <div className="mb-2 font-medium whitespace-nowrap leading-none" style={{ color: config.timeTextColor }}>
                 {config.lastTimeSim}ms {config.prefix} • {formattedDate} {formattedTime}
               </div>
               
@@ -431,9 +459,9 @@ const App: React.FC = () => {
           </div>
           
           <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3">
-             <div className="text-xl">🛠️</div>
+             <div className="text-xl">🎨</div>
              <p className="text-sm text-emerald-200 leading-relaxed">
-              <strong>True Path Integration:</strong> The generator uses native shell escape sequences (<code>\w</code>, <code>%~</code>, etc.) to fetch your directory automatically. Choose your preferred <strong>Path Style</strong> above.
+              <strong>User/Group Customization:</strong> You can now toggle the group display or swap the order of user and group in Row 1. Spacing for the time row is now perfectly balanced.
              </p>
           </div>
         </div>
