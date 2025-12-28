@@ -12,7 +12,6 @@ export enum PathStyle {
 export interface PromptConfig {
   user: string;
   context: string;
-  prefix: string;
   showGit: boolean;
   isDirty: boolean;
   directorySim: string;
@@ -22,6 +21,7 @@ export interface PromptConfig {
   use12hTime: boolean;
   showGroup: boolean;
   invertUserGroup: boolean;
+  showIcons: boolean;
   osBgColor: string;
   osTextColor: string;
   shellBgColor: string;
