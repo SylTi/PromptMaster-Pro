@@ -1,0 +1,5 @@
+{
+  "name": "PromptMaster Pro",
+  "description": "A high-end terminal prompt generator for Bash and Zsh, featuring a multi-line aesthetic with Git status integration and WSL indicators.",
+  "requestFramePermissions": []
+}
